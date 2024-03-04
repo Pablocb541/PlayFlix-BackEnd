@@ -1,31 +1,17 @@
+// index.js
+
 const express = require('express');
+
+const CrudVideosApp = require('./videos/CrudVideos');
+const registroApp = require('./registro/registro');
+
 const app = express();
-// conexión a la base de datos
+const PORT = 3000;
 
-const mongoose = require("mongoose");
-const db = mongoose.connect("mongodb+srv://chaconp560:juanpablo123@pablo.mfkiod2.mongodb.net/", {
-  useNewUrlParser: true,
-  useFindAndModify: false,
-  useUnifiedTopology: true
-});
-
-const {
-  registroPost
-} = require("./controllers/registrosController.js");
-
-// parser para el cuerpo de la solicitud (necesario para los métodos POST y PUT)
-const bodyParser = require("body-parser");
-app.use(bodyParser.json());
-
-// verificar cors
-const cors = require("cors");
-app.use(cors({
-  domains: '*',
-  methods: "*"
-}));
+// // Iniciar la aplicación de registro en el puerto 3001
 
 
-// rutas para las registercd 
-app.post("/api/registros", registroPost);
-
-app.listen(3000, () => console.log(`Aplicación iniciando en el puerto 3000!`));
+// Iniciar la aplicación de CRUD de videos en el puerto 3000
+// crudVideosApp.listen(PORT, () => {
+//     console.log(`Servidor de CRUD de videos corriendo en el puerto ${PORT}`);
+// });

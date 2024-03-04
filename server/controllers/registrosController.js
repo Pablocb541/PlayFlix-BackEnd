@@ -32,6 +32,8 @@ const registroPost = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
+
+
 const registroGet = (req, res) => {
   // si se requiere una registro específica
   if (req.query && req.query.id) {
