@@ -1,13 +1,25 @@
-// Importa el modelo de registro
 const registro = require("../models/registrosModel");
 
-/**
- * Crea una registro
- *
- * @param {*} req
- * @param {*} res
- */
 const registroPost = async (req, res) => {
+  const { correoElectronico, contraseña, repetirContraseña, pin, nombre, apellidos, fechaNacimiento } = req.body;
+
+  // Validación de campos requeridos
+  if (!correoElectronico || !contraseña || !repetirContraseña || !pin || !nombre || !apellidos || !fechaNacimiento) {
+    return res.status(400).json({ error: 'Todos los campos marcados con (*) son requeridos.' });
+  }
+
+  // Validación de la edad del usuario
+  const edadUsuario = calcularEdad(fechaNacimiento);
+  if (edadUsuario < 18) {
+    return res.status(400).json({ error: 'Debes tener al menos 18 años para registrarte.' });
+  }
+
+  // Validación de contraseña y repetición de contraseña
+  if (contraseña !== repetirContraseña) {
+    return res.status(400).json({ error: 'Las contraseñas no coinciden.' });
+  }
+
+  // Resto del código para guardar el registro
   let registros = new registro(req.body);
   await registros.save()
     .then(registro => {
@@ -25,14 +37,6 @@ const registroPost = async (req, res) => {
       });
     });
 };
-
-/**
- * Obtiene todas las registros o una
- *
- * @param {*} req
- * @param {*} res
- */
-
 
 const registroGet = (req, res) => {
   // si se requiere una registro específica
@@ -59,12 +63,6 @@ const registroGet = (req, res) => {
   }
 };
 
-/**
- * Actualiza una registro
- *
- * @param {*} req
- * @param {*} res
- */
 const registroPut = (req, res) => {
   registro.findByIdAndUpdate(req.query.id, req.body, { new: true })
     .then(registro => {
@@ -80,12 +78,6 @@ const registroPut = (req, res) => {
     });
 };
 
-/**
- * Elimina una registro
- *
- * @param {*} req
- * @param {*} res
- */
 const registroDelete = (req, res) => {
   registro.findByIdAndDelete(req.query.id)
     .then(registro => {
@@ -100,6 +92,18 @@ const registroDelete = (req, res) => {
       res.json({ "error": err });
     });
 };
+
+// Función para calcular la edad a partir de la fecha de nacimiento
+function calcularEdad(fechaNacimiento) {
+  const hoy = new Date();
+  const cumpleaños = new Date(fechaNacimiento);
+  let edad = hoy.getFullYear() - cumpleaños.getFullYear();
+  const mes = hoy.getMonth() - cumpleaños.getMonth();
+  if (mes < 0 || (mes === 0 && hoy.getDate() < cumpleaños.getDate())) {
+    edad--;
+  }
+  return edad;
+}
 
 module.exports = {
   registroPost,

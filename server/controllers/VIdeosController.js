@@ -32,7 +32,9 @@ const videoPost = async (req, res) => {
 
 const videoGet = async (req, res) => {
     try {
-        const videos = await Video.find();
+        const videos = await Video.find()
+        
+
         res.json(videos);
     } catch (error) {
         console.error('Error al obtener los videos:', error);

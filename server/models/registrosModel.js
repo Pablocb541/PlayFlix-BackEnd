@@ -1,14 +1,15 @@
+// registrosModel.js
+
 const mongoose = require('mongoose');
 
 const registroSchema = new mongoose.Schema({
-  nombre: { type: String },
-  apellido: { type: String },
-  contraseña: { type: String },
-  repetirConstraseña: { type: String },
-  pin: { type: Number },
-  gmail: { type: String },
+  nombre: { type: String, required: true },
+  apellido: { type: String, required: true },
+  contrasena: { type: String, required: true },
+  pin: { type: Number, required: true },
+  correoElectronico: { type: String, required: true, unique: true },
   pais: { type: String },
-  fechaNacimiento: { type: Date}
+  fechaNacimiento: { type: Date, required: true }
 });
 
-module.exports = mongoose.model('registro', registroSchema);
+module.exports = mongoose.model('Registro', registroSchema);
