@@ -1,5 +1,3 @@
-//registor
-
 const express = require('express');
 const app = express();
 const dbUrl = require('../db/dbConfig.js');
@@ -18,11 +16,6 @@ mongoose.connect(dbUrl, {
     console.error('Error de conexión a la base de datos:', error);
 });
 
-const { 
-    registroPost, 
-    registroGet
- } = require("../controllers/registrosController.js");
-
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
@@ -32,8 +25,21 @@ app.use(cors({
     methods: "*"
 }));
 
+
+// Controladores
+const { 
+    registroPost, 
+    registroGet
+} = require("../controllers/registrosController.js");
+
+const { 
+    loginPost 
+} = require("../controllers/loginController.js");
+
+// Registro de rutas
 app.post("/api/registros", registroPost);
 app.get("/api/registros", registroGet);
+app.post("/api/login", loginPost);
 
 app.listen(PORT, () => console.log(`Aplicación iniciando en el puerto ${PORT}!`));
 

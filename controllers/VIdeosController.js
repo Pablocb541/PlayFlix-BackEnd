@@ -32,13 +32,14 @@ const videoPost = async (req, res) => {
 
 const videoGet = async (req, res) => {
     try {
-        const videos = await Video.find({}, 'youtubeUrl'); // Solo selecciona el campo 'youtubeUrl'
+        const videos = await Video.find({}, 'name youtubeUrl'); // Selecciona los campos 'name' y 'youtubeUrl'
         res.json(videos);
     } catch (error) {
         console.error('Error al obtener los videos:', error);
         res.status(500).json({ error: 'Hubo un error al obtener los videos' });
     }
 };
+
 
 
 /**

@@ -1,43 +1,27 @@
-const Registro = require("../models/registrosModel");
+const registro = require("../models/user");
 
-const savelogin = async function (email, token) {
-  // Implementa la lógica para guardar el token de inicio de sesión en la base de datos
-  // y devuelve una promesa
-};
+const loginPost = async (req, res) => {
+  const { correoElectronico, contraseña } = req.body;
 
-const login = function (req, res, next) {
-  if (req.body.email && req.body.password) {
-    // Buscar el usuario por su correo electrónico en la colección de registros
-    Registro.findOne({ email: req.body.email }, function(err, usuario) {
-      if (err) {
-        res.status(500).json({ error: "Error interno del servidor" });
-        return;
-      }
-      if (!usuario) {
-        res.status(422).json({ error: "Usuario no encontrado" });
-        return;
-      }
-      // Comparar la contraseña proporcionada con la contraseña almacenada en la base de datos
-      if (usuario.password === req.body.password) {
-        // Las credenciales son válidas, generar token de autenticación
-        const token = generateToken(); // Implementa la función de generación de token según tu elección
-        // Guardar el token de inicio de sesión en la base de datos o en la sesión
-        savelogin(req.body.email, token)
-          .then(function(login) {
-            res.status(200).json({ token: token });
-          })
-          .catch(function(err) {
-            res.status(500).json({ error: "Error interno del servidor" });
-          });
-      } else {
-        res.status(422).json({ error: "Usuario o contraseña inválidos" });
-      }
-    });
-  } else {
-    res.status(422).json({ error: "Por favor, proporcione correo electrónico y contraseña" });
+  // Validación de campos requeridos
+  if (!correoElectronico || !contraseña) {
+    return res.status(400).json({ error: 'El correo electrónico y la contraseña son requeridos.' });
   }
+
+  // Verificar si el usuario existe en la base de datos
+  registro.findOne({ correoElectronico, contraseña })
+    .then(usuario => {
+      if (!usuario) {
+        return res.status(404).json({ error: 'Usuario o contraseña inválidos.' });
+      }
+      // Si el usuario existe, puedes realizar otras acciones, como generar un token de autenticación y devolverlo en la respuesta.
+      res.status(200).json({ mensaje: 'Inicio de sesión exitoso', usuario });
+    })
+    .catch(err => {
+      res.status(500).json({ error: 'Error interno del servidor' });
+    });
 };
 
 module.exports = {
-  login
+  loginPost
 };
