@@ -16,7 +16,7 @@ mongoose.connect(dbUrl, {
     console.error('Error de conexión a la base de datos:', error);
 });
 
-const { registroPost } = require("../controllers/registrosController.js");
+const { registroPost, login } = require("../controllers/registrosController.js");
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
@@ -29,6 +29,9 @@ app.use(cors({
 
 // Rutas de Registro
 app.post("/api/registros", registroPost);
+
+// Ruta de Login
+app.post("/api/login", login);
 
 app.listen(PORT, () => console.log(`Aplicación iniciando en el puerto ${PORT}!`));
 
