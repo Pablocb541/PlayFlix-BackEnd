@@ -1,4 +1,4 @@
-const registro = require("../models/user");
+const registro = require("../models/registrosModel");
 
 const loginPost = async (req, res) => {
   const { correoElectronico, contraseña } = req.body;
