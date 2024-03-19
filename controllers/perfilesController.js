@@ -8,13 +8,22 @@ const UsuarioRestringido = require("../models/perfilesModel");
  */
 const usuarioRestringidoPost = async (req, res) => {
   const { nombreCompleto, pin, avatar, edad } = req.body;
+  const errorMessages = [];
 
   // Validación de campos requeridos
   if (!nombreCompleto || !pin || !avatar || !edad) {
-    return res.status(400).json({ error: "Todos los campos marcados con (*) son requeridos." });
+    errorMessages.push("Todos los campos marcados con (*) son requeridos.");
   }
 
-  // Otras validaciones pueden incluir la validación del formato del PIN, la edad, etc.
+  // Verificar si ya existe un usuario con el mismo nombre
+  const usuarioExistente = await UsuarioRestringido.findOne({ nombreCompleto });
+  if (usuarioExistente) {
+    errorMessages.push("Ya existe un usuario con el mismo nombre.");
+  }
+
+  if (errorMessages.length > 0) {
+    return res.status(400).json({ errors: errorMessages }); // Devolver mensajes de error
+  }
 
   try {
     // Crear un nuevo usuario restringido
@@ -92,9 +101,40 @@ const usuarioRestringidoDelete = async (req, res) => {
   }
 };
 
+/**
+ * Autentica un usuario restringido y envía la URL de redirección
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+const loginPin = async (req, res) => {
+  const { pin } = req.body;
+  
+  try {
+    // Buscar el usuario restringido en la base de datos por su PIN
+    const usuario = await UsuarioRestringido.findOne({ pin });
+
+    // Verificar si el usuario existe
+    if (!usuario) {
+      return res.status(401).json({ error: "PIN inválido." });
+    }
+
+    // Si el PIN es válido, enviar la URL de redirección según el tipo de usuario
+    if (usuario.nombreCompleto === "administrador") {
+      res.status(200).json({ redirectURL: "./admin.html" }); // Redirigir al panel de administrador
+    } else {
+      res.status(200).json({ redirectURL: "./videos.html" }); // Redirigir a otra página para usuarios regulares
+    }
+  } catch (error) {
+    console.error("Error al autenticar usuario:", error);
+    res.status(500).json({ error: "Hubo un error al autenticar el usuario." });
+  }
+};
+
 module.exports = {
   usuarioRestringidoPost,
   usuarioRestringidoGet,
   usuarioRestringidoUpdate,
-  usuarioRestringidoDelete
+  usuarioRestringidoDelete,
+  loginPin
 };

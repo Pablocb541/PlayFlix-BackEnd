@@ -1,10 +1,12 @@
+require('dotenv').config();
+const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
-const dbUrl = require('./db/dbConfig');
+const mongoString = process.env.DATABASE_URL;
 const app = express();
 const PORT = 3000;
 
-mongoose.connect(dbUrl, {
+mongoose.connect(mongoString, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true
@@ -19,22 +21,23 @@ const {
     usuarioRestringidoPost,
     usuarioRestringidoGet,
     usuarioRestringidoUpdate,
-    usuarioRestringidoDelete }
-     = require('./controllers/perfilesController.js');
+    usuarioRestringidoDelete,
+    loginPin
+} = require('./controllers/perfilesController.js');
 
 const { 
-        videoPost,
-        videoGet, 
-        videoDelete,
-        videoUpdate }
-         = require('./controllers/VIdeosController');    
+    videoPost,
+    videoGet, 
+    videoDelete,
+    videoUpdate
+} = require('./controllers/VIdeosController');    
 
 const { registroPost, login } = require("./controllers/registrosController.js");
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-const cors = require("cors");
+
 app.use(cors({
     domains: '*',
     methods: "*"
@@ -55,8 +58,11 @@ app.post("/api/login", login);
 // Rutas de perfiles
 app.post('/api/perfiles',usuarioRestringidoPost);
 app.get('/api/perfiles', usuarioRestringidoGet);
-app.patch('/api/perfiles',usuarioRestringidoUpdate);
-app.delete('/api/perfiles',usuarioRestringidoDelete); 
+app.patch('/api/perfiles/:id',usuarioRestringidoUpdate); // Modificado para incluir el ID en la ruta
+app.delete('/api/perfiles',usuarioRestringidoDelete);
+
+// Ruta para verificar el PIN
+app.post('/api/loginPin', loginPin);
 
 app.listen(PORT, () => console.log(`Aplicación iniciando en el puerto ${PORT} !`));
 
