@@ -32,7 +32,11 @@ const {
     videoUpdate
 } = require('./controllers/VIdeosController');    
 
-const { registroPost, login } = require("./controllers/registrosController.js");
+const { 
+    registroPost,
+    login,
+    loginUsuarios
+ } = require("./controllers/registrosController.js");
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
@@ -53,12 +57,13 @@ app.delete('/api/videos', videoDelete);
 app.post("/api/registros", registroPost);
 
 // Ruta de Login
-app.post("/api/login", login);
+app.post("/api/login",login);
+app.post("/api/loginUsuarios",loginUsuarios);
 
 // Rutas de perfiles
 app.post('/api/perfiles',usuarioRestringidoPost);
 app.get('/api/perfiles', usuarioRestringidoGet);
-app.patch('/api/perfiles/:id',usuarioRestringidoUpdate); // Modificado para incluir el ID en la ruta
+app.patch('/api/perfiles',usuarioRestringidoUpdate); // Modificado para incluir el ID en la ruta
 app.delete('/api/perfiles',usuarioRestringidoDelete);
 
 // Ruta para verificar el PIN

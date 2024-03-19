@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const UsuarioRestringido = require("../models/perfilesModel");
 
 /**
@@ -69,12 +71,18 @@ const usuarioRestringidoUpdate = async (req, res) => {
   }
 
   try {
+    // Intentar actualizar el usuario restringido en la base de datos
     const usuarioRestringido = await UsuarioRestringido.findByIdAndUpdate(id, req.body, { new: true });
+
+    // Si el usuario no se encuentra en la base de datos, responder con un error 404
     if (!usuarioRestringido) {
       return res.status(404).json({ error: "Usuario restringido no encontrado." });
     }
+
+    // Si la actualización tiene éxito, responder con el usuario actualizado
     res.status(200).json(usuarioRestringido);
   } catch (error) {
+    // Si ocurre un error durante la actualización, responder con un error 500
     console.error("Error al actualizar el usuario restringido:", error);
     res.status(500).json({ error: "Hubo un error al actualizar el usuario restringido." });
   }
@@ -114,22 +122,20 @@ const loginPin = async (req, res) => {
     // Buscar el usuario restringido en la base de datos por su PIN
     const usuario = await UsuarioRestringido.findOne({ pin });
 
-    // Verificar si el usuario existe
-    if (!usuario) {
+    // Verificar si el usuario existe y si el PIN coincide
+    if (!usuario || usuario.pin !== pin) {
       return res.status(401).json({ error: "PIN inválido." });
     }
 
-    // Si el PIN es válido, enviar la URL de redirección según el tipo de usuario
-    if (usuario.nombreCompleto === "administrador") {
-      res.status(200).json({ redirectURL: "./admin.html" }); // Redirigir al panel de administrador
-    } else {
-      res.status(200).json({ redirectURL: "./videos.html" }); // Redirigir a otra página para usuarios regulares
-    }
+    // Si el PIN es válido, enviar la URL de redirección para usuarios regulares
+    res.status(200).json({ redirectURL: "./videos.html" });
   } catch (error) {
-    console.error("Error al autenticar usuario:", error);
-    res.status(500).json({ error: "Hubo un error al autenticar el usuario." });
+    console.error("Error al autenticar usuario por PIN:", error);
+    res.status(500).json({ error: "Hubo un error al autenticar el usuario por PIN." });
   }
 };
+
+
 
 module.exports = {
   usuarioRestringidoPost,

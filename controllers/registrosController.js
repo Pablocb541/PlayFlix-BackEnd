@@ -1,9 +1,7 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 const Registro = require("../models/registrosModel");
 
 /**
- * Crea un registro de usuario
+ * Crea un registro
  *
  * @param {*} req
  * @param {*} res
@@ -48,33 +46,36 @@ const registroPost = async (req, res) => {
     return res.status(400).json({ error: "Las contraseñas no coinciden." });
   }
 
-  try {
-    // Verificar si el correo electrónico ya está registrado
-    let usuario = await Registro.findOne({ correoElectronico });
-    if (usuario) {
-      return res
-        .status(400)
-        .json({ error: "El correo electrónico ya está registrado." });
-    }
+  // Resto del código para guardar el registro
+  let usuario = await Registro.findOne({ correoElectronico });
 
-    // Crear un nuevo usuario
-    usuario = new Registro(req.body);
-
-    // Hashear la contraseña antes de guardarla
-    const salt = await bcrypt.genSalt(10);
-    usuario.contraseña = await bcrypt.hash(contraseña, salt);
-
-    await usuario.save();
-    
-    res.status(201).json(usuario); // Respuesta exitosa con el usuario creado
-  } catch (error) {
-    console.error("Error al guardar el registro:", error);
-    res.status(500).json({ error: "Hubo un error al guardar el registro." });
+  if (usuario) {
+    return res
+      .status(400)
+      .json({ error: "El correo electrónico ya está registrado." });
   }
+
+  usuario = new Registro(req.body);
+  await usuario
+    .save()
+    .then((registro) => {
+      res.status(201); // CREATED
+      res.header({
+        location: `/api/registros/?id=${usuario.id}`,
+      });
+      res.json(registro);
+    })
+    .catch((err) => {
+      res.status(422);
+      console.log("Error al guardar el registro", err);
+      res.json({
+        error: "Hubo un error al guardar el registro",
+      });
+    });
 };
 
 /**
- * Autentica un usuario y genera un token JWT
+ * Autentica un usuario mediante correo electrónico y contraseña
  *
  * @param {*} req
  * @param {*} res
@@ -83,30 +84,50 @@ const login = async (req, res) => {
     const { correoElectronico, contraseña } = req.body;
     
     try {
-      // Buscar el usuario en la base de datos por su correo electrónico
-      const usuario = await Registro.findOne({ correoElectronico });
-  
-      // Verificar si el usuario existe
-      if (!usuario) {
-        return res.status(401).json({ error: "Usuario o contraseña inválida." });
-      }
-
-    //   console.log("Usuario encontrado en la base de datos:", usuario);
-  
-      // Verificar si la contraseña coincide exactamente
-      if (contraseña !== usuario['contraseña']) {
-        return res.status(401).json({ error: "Usuario o contraseña inválida." });
-      }
-  
-      // Si el usuario y la contraseña son válidos, responder con éxito
-      res.status(200).json({ message: "Inicio de sesión exitoso." });
+        // Buscar el usuario en la base de datos por su correo electrónico
+        const usuario = await Registro.findOne({ correoElectronico });
+    
+        // Verificar si el usuario existe
+        if (!usuario) {
+            return res.status(401).json({ error: "Usuario o contraseña inválida." });
+        }
+    
+        // Comparar la contraseña ingresada con la contraseña almacenada en la base de datos
+        if (contraseña !== usuario.contraseña) {
+            return res.status(401).json({ error: "Usuario o contraseña inválida." });
+        }
+    
+        res.status(200).json({ message: "Inicio de sesión exitoso." });
     } catch (error) {
-      console.error("Error al autenticar usuario:", error);
-      res.status(500).json({ error: "Hubo un error al autenticar el usuario." });
+        console.error("Error al autenticar usuario:", error);
+        res.status(500).json({ error: "Hubo un error al autenticar el usuario." });
     }
-  };
-  
-  
+};
+
+/**
+ * Autentica un usuario mediante PIN
+ *
+ * @param {*} req
+ * @param {*} res
+ */
+const loginUsuarios = async (req, res) => {
+    const { pin } = req.body;
+    
+    try {
+        // Buscar el usuario en la base de datos por su PIN
+        const usuario = await Registro.findOne({ pin });
+    
+        // Verificar si el usuario existe
+        if (!usuario) {
+            return res.status(401).json({ error: "PIN inválido." });
+        }
+    
+        res.status(200).json({ message: "Inicio de sesión exitoso." });
+    } catch (error) {
+        console.error("Error al autenticar usuario por PIN:", error);
+        res.status(500).json({ error: "Hubo un error al autenticar el usuario por PIN." });
+    }
+};
 
 // Función para calcular la edad a partir de la fecha de nacimiento
 function calcularEdad(fechaNacimiento) {
@@ -123,4 +144,5 @@ function calcularEdad(fechaNacimiento) {
 module.exports = {
   registroPost,
   login,
+  loginUsuarios
 };
