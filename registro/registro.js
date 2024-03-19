@@ -1,20 +1,26 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const dbUrl = require('../db/dbConfig');
 const app = express();
-const dbUrl = require('../db/dbConfig.js');
-const PORT = 3000;
+const PORT = 3001;
 
-const mongoose = require("mongoose");
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true
-})
-.then(() => {
+
+}).then(() => {
     console.log('Conexión exitosa a la base de datos');
-})
-.catch(error => {
+}).catch(error => {
     console.error('Error de conexión a la base de datos:', error);
 });
+
+const { 
+    videoPost,
+    videoGet, 
+    videoDelete,
+    videoUpdate }
+     = require('../controllers/VIdeosController');
 
 const { registroPost, login } = require("../controllers/registrosController.js");
 
@@ -27,12 +33,18 @@ app.use(cors({
     methods: "*"
 }));
 
+// Rutas de Videos
+app.post('/api/videos', videoPost);
+app.get('/api/videos', videoGet);
+app.patch('/api/videos', videoUpdate);
+app.delete('/api/videos', videoDelete);
+
 // Rutas de Registro
 app.post("/api/registros", registroPost);
 
 // Ruta de Login
 app.post("/api/login", login);
 
-app.listen(PORT, () => console.log(`Aplicación iniciando en el puerto ${PORT}!`));
+app.listen(PORT, () => console.log(`Aplicación iniciando en el puerto ${PORT} !`));
 
 module.exports = app;
