@@ -96,14 +96,14 @@ const login = async (req, res) => {
         if (contraseña !== usuario.contraseña) {
             return res.status(401).json({ error: "Usuario o contraseña inválida." });
         }
-    
-        res.status(200).json({ message: "Inicio de sesión exitoso." });
+        
+        // Si el usuario existe y la contraseña coincide, devolver su ID y nombre en la respuesta
+        return res.status(200).json({ message: "Inicio de sesión exitoso.", id: usuario._id, nombre: usuario.nombre });
     } catch (error) {
         console.error("Error al autenticar usuario:", error);
         res.status(500).json({ error: "Hubo un error al autenticar el usuario." });
     }
 };
-
 /**
  * Autentica un usuario mediante PIN
  *
