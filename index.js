@@ -50,7 +50,7 @@ app.use(cors({
 // Rutas de Videos
 app.post('/api/videos', videoPost);
 app.get('/api/videos', videoGet);
-app.patch('/api/videos', videoUpdate);
+app.put('/api/videos/:id', videoUpdate);
 app.delete('/api/videos', videoDelete);
 
 // Rutas de Registro
@@ -63,7 +63,7 @@ app.post("/api/loginUsuarios",loginUsuarios);
 // Rutas de perfiles
 app.post('/api/perfiles',usuarioRestringidoPost);
 app.get('/api/perfiles', usuarioRestringidoGet);
-app.patch('/api/perfiles',usuarioRestringidoUpdate); // Modificado para incluir el ID en la ruta
+app.put('/api/perfiles/:id',usuarioRestringidoUpdate); // Modificado para incluir el ID en la ruta
 app.delete('/api/perfiles',usuarioRestringidoDelete);
 
 // Ruta para verificar el PIN

@@ -70,21 +70,47 @@ const videoDelete = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
+
+
+// Actualiza un video existente por su ID
 const videoUpdate = async (req, res) => {
-    const { id } = req.params; // Cambiado a params en lugar de query
-    const { name, youtubeUrl } = req.body;
+    
     try {
-        // Busca el video por su ID y actualiza sus campos
-        const updatedVideo = await Video.findByIdAndUpdate(id, { name, youtubeUrl }, { new: true });
-        if (!updatedVideo) {
-            return res.status(404).json({ error: 'El video no existe' });
+        const { id } = req.params;
+        const { youtubeURL, name } = req.body;
+
+        // Verificar si el video existe en la base de datos
+        const video = await Video.findById(id);
+        if (!video) {
+            return res.status(404).json({ message: 'Video no encontrado' });
         }
-        res.json(updatedVideo);
+
+        // Actualizar la URL de YouTube si se proporciona
+        if (youtubeURL) {
+            const videoId = obtenerIdVideoYoutube(youtubeURL);
+            if (!videoId) {
+                return res.status(400).json({ error: 'La URL de YouTube no es válida' });
+            }
+            video.youtubeUrl = youtubeURL;
+        }
+
+        // Actualizar el nombre del video si se proporciona
+        if (name) {
+            video.name = name;
+        }
+
+        // Guardar los cambios en el video actualizado
+        await video.save();
+
+        // Responder con el video actualizado
+        return res.status(200).json({ message: 'Video actualizado correctamente' });
     } catch (error) {
+        // Manejar errores
         console.error('Error al actualizar el video:', error);
-        res.status(500).json({ error: 'Hubo un error al actualizar el video' });
+        return res.status(500).json({ error: 'Error al actualizar el video' });
     }
 };
+
 
 module.exports = {
     videoPost,
