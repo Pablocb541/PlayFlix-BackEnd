@@ -115,23 +115,24 @@ const login = async (req, res) => {
  * @param {*} res
  */
 const loginUsuarios = async (req, res) => {
-    const { pin } = req.body;
-    
-    try {
-        // Buscar el usuario en la base de datos por su PIN
-        const usuario = await Registro.findOne({ pin });
-    
-        // Verificar si el usuario existe
-        if (!usuario) {
-            return res.status(401).json({ error: "PIN inválido." });
-        }
-    
-        res.status(200).json({ message: "Inicio de sesión exitoso." });
-    } catch (error) {
-        console.error("Error al autenticar usuario por PIN:", error);
-        res.status(500).json({ error: "Hubo un error al autenticar el usuario por PIN." });
-    }
+  const { pin } = req.body;
+  
+  try {
+      // Buscar el usuario en la base de datos por su PIN
+      const usuario = await Registro.findOne({ pin });
+  
+      // Verificar si el usuario existe
+      if (!usuario) {
+          return res.status(401).json({ error: "PIN inválido." });
+      }
+  
+      res.status(200).json({ success: true, message: "Inicio de sesión exitoso." }); // Agregamos success:true si el PIN es válido
+  } catch (error) {
+      console.error("Error al autenticar usuario por PIN:", error);
+      res.status(500).json({ error: "Hubo un error al autenticar el usuario por PIN." });
+  }
 };
+
 
 // Función para calcular la edad a partir de la fecha de nacimiento
 function calcularEdad(fechaNacimiento) {

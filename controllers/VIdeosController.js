@@ -78,11 +78,11 @@ const videoDelete = async (req, res) => {
 
 
 // Actualiza un video existente por su ID
+// Actualiza un video existente por su ID
 const videoUpdate = async (req, res) => {
-    
     try {
         const { id } = req.params;
-        const { youtubeURL, name } = req.body;
+        const { youtubeUrl, name } = req.body;
 
         // Verificar si el video existe en la base de datos
         const video = await Video.findById(id);
@@ -91,12 +91,8 @@ const videoUpdate = async (req, res) => {
         }
 
         // Actualizar la URL de YouTube si se proporciona
-        if (youtubeURL) {
-            const videoId = obtenerIdVideoYoutube(youtubeURL);
-            if (!videoId) {
-                return res.status(400).json({ error: 'La URL de YouTube no es válida' });
-            }
-            video.youtubeUrl = youtubeURL;
+        if (youtubeUrl !== undefined && youtubeUrl.trim() !== '') {
+            video.youtubeUrl = youtubeUrl.trim();
         }
 
         // Actualizar el nombre del video si se proporciona
@@ -115,6 +111,8 @@ const videoUpdate = async (req, res) => {
         return res.status(500).json({ error: 'Error al actualizar el video' });
     }
 };
+
+
 
 
 module.exports = {
