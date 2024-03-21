@@ -1,14 +1,17 @@
+// Importación del módulo bcrypt para el cifrado de contraseñas
 const bcrypt = require('bcrypt');
 
+// Importación del modelo UsuarioRestringido desde "../models/perfilesModel"
 const UsuarioRestringido = require("../models/perfilesModel");
 
 /**
- * Crea un usuario restringido
+ * Controlador para crear un nuevo usuario restringido
  *
  * @param {*} req
  * @param {*} res
  */
 const usuarioRestringidoPost = async (req, res) => {
+  // Extraer datos del cuerpo de la solicitud
   const { nombreCompleto, pin, avatar, edad ,userId} = req.body;
   const errorMessages = [];
 
@@ -40,7 +43,7 @@ const usuarioRestringidoPost = async (req, res) => {
 };
 
 /**
- * Obtiene todos los usuarios restringidos
+ * Controlador para obtener todos los usuarios restringidos asociados con un userId
  *
  * @param {*} req
  * @param {*} res
@@ -69,9 +72,8 @@ const usuarioRestringidoGet = async (req, res) => {
   }
 };
 
-
 /**
- * Actualiza un usuario restringido
+ * Controlador para actualizar un usuario restringido
  *
  * @param {*} req
  * @param {*} res
@@ -104,7 +106,7 @@ const usuarioRestringidoUpdate = async (req, res) => {
 };
 
 /**
- * Elimina un usuario restringido
+ * Controlador para eliminar un usuario restringido
  *
  * @param {*} req
  * @param {*} res
@@ -125,7 +127,7 @@ const usuarioRestringidoDelete = async (req, res) => {
 };
 
 /**
- * Autentica un usuario restringido y envía la URL de redirección
+ * Controlador para autenticar un usuario restringido por PIN
  *
  * @param {*} req
  * @param {*} res
@@ -150,8 +152,7 @@ const loginPin = async (req, res) => {
   }
 };
 
-
-
+// Exportación de los controladores
 module.exports = {
   usuarioRestringidoPost,
   usuarioRestringidoGet,

@@ -1,13 +1,17 @@
+// Importación del módulo jwt para la generación de tokens de autenticación
 const jwt = require('jsonwebtoken');
+
+// Importación del modelo Registro desde "../models/registrosModel"
 const Registro = require("../models/registrosModel");
 
 /**
- * Crea un registro
+ * Controlador para crear un nuevo registro de usuario
  *
  * @param {*} req
  * @param {*} res
  */
 const registroPost = async (req, res) => {
+  // Extracción de datos del cuerpo de la solicitud
   const {
     correoElectronico,
     contraseña,
@@ -56,6 +60,7 @@ const registroPost = async (req, res) => {
       .json({ error: "El correo electrónico ya está registrado." });
   }
 
+  // Guardar el registro en la base de datos
   usuario = new Registro(req.body);
   await usuario
     .save()
@@ -76,7 +81,7 @@ const registroPost = async (req, res) => {
 };
 
 /**
- * Autentica un usuario mediante correo electrónico y contraseña
+ * Controlador para autenticar un usuario mediante correo electrónico y contraseña
  *
  * @param {*} req
  * @param {*} res
@@ -108,8 +113,9 @@ const login = async (req, res) => {
       res.status(500).json({ error: "Hubo un error al autenticar el usuario." });
   }
 };
+
 /**
- * Autentica un usuario mediante PIN
+ * Controlador para autenticar un usuario mediante PIN
  *
  * @param {*} req
  * @param {*} res
@@ -133,7 +139,6 @@ const loginUsuarios = async (req, res) => {
   }
 };
 
-
 // Función para calcular la edad a partir de la fecha de nacimiento
 function calcularEdad(fechaNacimiento) {
   const hoy = new Date();
@@ -146,6 +151,7 @@ function calcularEdad(fechaNacimiento) {
   return edad;
 }
 
+// Exportación de los controladores
 module.exports = {
   registroPost,
   login,

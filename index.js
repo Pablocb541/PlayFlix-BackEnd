@@ -1,22 +1,24 @@
-require('dotenv').config();
-const cors = require('cors');
-const express = require('express');
-const mongoose = require('mongoose');
-const mongoString = process.env.DATABASE_URL;
-const app = express();
-const PORT = 3000;
+// Importación de paquetes y configuraciones
+require('dotenv').config(); // Cargar variables de entorno desde .env
+const cors = require('cors'); // Middleware para habilitar CORS
+const express = require('express'); // Framework web para Node.js
+const mongoose = require('mongoose'); // ODM para MongoDB
+const mongoString = process.env.DATABASE_URL; // Obtener la URL de la base de datos desde las variables de entorno
+const app = express(); // Crear una instancia de la aplicación Express
+const PORT = 3000; // Puerto en el que se ejecutará el servidor
 
+// Conexión a la base de datos MongoDB
 mongoose.connect(mongoString, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true
-
 }).then(() => {
     console.log('Conexión exitosa a la base de datos');
 }).catch(error => {
     console.error('Error de conexión a la base de datos:', error);
 });
 
+// Importación de controladores
 const { 
     usuarioRestringidoPost,
     usuarioRestringidoGet,
@@ -38,10 +40,11 @@ const {
     loginUsuarios
  } = require("./controllers/registrosController.js");
 
+// Middleware para analizar el cuerpo de las solicitudes en formato JSON
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-
+// Middleware para habilitar CORS
 app.use(cors({
     domains: '*',
     methods: "*"
@@ -56,7 +59,7 @@ app.delete('/api/videos', videoDelete);
 // Rutas de Registro
 app.post("/api/registros", registroPost);
 
-// Ruta de Login
+// Rutas de Login
 app.post("/api/login",login);
 app.post("/api/loginUsuarios",loginUsuarios);
 
@@ -69,6 +72,7 @@ app.delete('/api/perfiles',usuarioRestringidoDelete);
 // Ruta para verificar el PIN
 app.post('/api/loginPin', loginPin);
 
+// Iniciar el servidor en el puerto especificado
 app.listen(PORT, () => console.log(`Aplicación iniciando en el puerto ${PORT} !`));
 
 module.exports = app;

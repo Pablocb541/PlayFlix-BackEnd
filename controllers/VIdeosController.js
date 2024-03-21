@@ -1,20 +1,19 @@
 // videosController.js
 
+// Importación del modelo Video desde '../models/videosModel'
 const Video = require('../models/videosModel');
 
-
 /**
- * Crea una registro
+ * Controlador para crear un nuevo registro de video
  *
  * @param {*} req
  * @param {*} res
  */
-
-
 const videoPost = async (req, res) => {
-    const { name, youtubeUrl,userId } = req.body;
+    const { name, youtubeUrl, userId } = req.body;
     try {
-        const newVideo = new Video({ name, youtubeUrl, userId }); // Asociar el ID del usuario con el video creado
+        // Crear un nuevo video asociado al ID del usuario
+        const newVideo = new Video({ name, youtubeUrl, userId });
         const savedVideo = await newVideo.save();
         res.status(201).json({ video: savedVideo, location: `/api/videos/${savedVideo._id}` });
     } catch (error) {
@@ -23,14 +22,12 @@ const videoPost = async (req, res) => {
     }
 };
 
-
 /**
- * Obtiene todas las registros o una
+ * Controlador para obtener todos los registros de videos asociados a un usuario
  *
  * @param {*} req
  * @param {*} res
  */
-
 const videoGet = async (req, res) => {
     try {
         const userId = req.query.userId; // Obtener el ID del usuario desde la consulta
@@ -45,18 +42,16 @@ const videoGet = async (req, res) => {
     }
 };
 
-
-
 /**
- * Actualiza una registro
+ * Controlador para eliminar un registro de video por su ID
  *
  * @param {*} req
  * @param {*} res
  */
-
 const videoDelete = async (req, res) => {
     const { id } = req.query;
     try {
+        // Buscar y eliminar el video por su ID
         const deletedVideo = await Video.findByIdAndDelete(id);
         if (!deletedVideo) {
             res.status(404).json({ error: 'El video no existe' });
@@ -70,15 +65,11 @@ const videoDelete = async (req, res) => {
 };
 
 /**
- * Actualiza un video existente
+ * Controlador para actualizar un registro de video por su ID
  *
  * @param {*} req
  * @param {*} res
  */
-
-
-// Actualiza un video existente por su ID
-// Actualiza un video existente por su ID
 const videoUpdate = async (req, res) => {
     try {
         const { id } = req.params;
@@ -112,9 +103,7 @@ const videoUpdate = async (req, res) => {
     }
 };
 
-
-
-
+// Exportación de los controladores
 module.exports = {
     videoPost,
     videoGet,
