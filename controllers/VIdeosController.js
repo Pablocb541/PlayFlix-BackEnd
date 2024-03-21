@@ -12,9 +12,9 @@ const Video = require('../models/videosModel');
 
 
 const videoPost = async (req, res) => {
-    const { name, youtubeUrl } = req.body;
+    const { name, youtubeUrl,userId } = req.body;
     try {
-        const newVideo = new Video({ name, youtubeUrl });
+        const newVideo = new Video({ name, youtubeUrl, userId }); // Asociar el ID del usuario con el video creado
         const savedVideo = await newVideo.save();
         res.status(201).json({ video: savedVideo, location: `/api/videos/${savedVideo._id}` });
     } catch (error) {
@@ -22,6 +22,7 @@ const videoPost = async (req, res) => {
         res.status(500).json({ error: 'Hubo un error al guardar el video' });
     }
 };
+
 
 /**
  * Obtiene todas las registros o una
@@ -32,7 +33,11 @@ const videoPost = async (req, res) => {
 
 const videoGet = async (req, res) => {
     try {
-        const videos = await Video.find({}, 'name youtubeUrl'); // Selecciona los campos 'name' y 'youtubeUrl'
+        const userId = req.query.userId; // Obtener el ID del usuario desde la consulta
+
+        // Buscar los videos asociados con el ID de usuario
+        const videos = await Video.find({ userId: userId }, 'name youtubeUrl');
+
         res.json(videos);
     } catch (error) {
         console.error('Error al obtener los videos:', error);

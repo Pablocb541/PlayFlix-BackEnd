@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const Registro = require("../models/registrosModel");
 
 /**
@@ -81,28 +82,31 @@ const registroPost = async (req, res) => {
  * @param {*} res
  */
 const login = async (req, res) => {
-    const { correoElectronico, contraseña } = req.body;
-    
-    try {
-        // Buscar el usuario en la base de datos por su correo electrónico
-        const usuario = await Registro.findOne({ correoElectronico });
-    
-        // Verificar si el usuario existe
-        if (!usuario) {
-            return res.status(401).json({ error: "Usuario o contraseña inválida." });
-        }
-    
-        // Comparar la contraseña ingresada con la contraseña almacenada en la base de datos
-        if (contraseña !== usuario.contraseña) {
-            return res.status(401).json({ error: "Usuario o contraseña inválida." });
-        }
-        
-        // Si el usuario existe y la contraseña coincide, devolver su ID y nombre en la respuesta
-        return res.status(200).json({ message: "Inicio de sesión exitoso.", id: usuario._id, nombre: usuario.nombre });
-    } catch (error) {
-        console.error("Error al autenticar usuario:", error);
-        res.status(500).json({ error: "Hubo un error al autenticar el usuario." });
-    }
+  const { correoElectronico, contraseña } = req.body;
+  
+  try {
+      // Buscar el usuario en la base de datos por su correo electrónico
+      const usuario = await Registro.findOne({ correoElectronico });
+  
+      // Verificar si el usuario existe
+      if (!usuario) {
+          return res.status(401).json({ error: "Usuario o contraseña inválida." });
+      }
+  
+      // Comparar la contraseña ingresada con la contraseña almacenada en la base de datos
+      if (contraseña !== usuario.contraseña) {
+          return res.status(401).json({ error: "Usuario o contraseña inválida." });
+      }
+      
+      // Si el usuario existe y la contraseña coincide, generar un token de autenticación
+      const token = jwt.sign({ userId: usuario._id }, 'secreto', { expiresIn: '1h' });
+
+      // Devolver el token junto con el ID y el pin del usuario en la respuesta
+      return res.status(200).json({ message: "Inicio de sesión exitoso.", token, id: usuario._id, pin: usuario.pin });
+  } catch (error) {
+      console.error("Error al autenticar usuario:", error);
+      res.status(500).json({ error: "Hubo un error al autenticar el usuario." });
+  }
 };
 /**
  * Autentica un usuario mediante PIN

@@ -9,7 +9,7 @@ const UsuarioRestringido = require("../models/perfilesModel");
  * @param {*} res
  */
 const usuarioRestringidoPost = async (req, res) => {
-  const { nombreCompleto, pin, avatar, edad } = req.body;
+  const { nombreCompleto, pin, avatar, edad ,userId} = req.body;
   const errorMessages = [];
 
   // Validación de campos requeridos
@@ -47,13 +47,28 @@ const usuarioRestringidoPost = async (req, res) => {
  */
 const usuarioRestringidoGet = async (req, res) => {
   try {
-    const usuariosRestringidos = await UsuarioRestringido.find();
-    res.status(200).json(usuariosRestringidos);
+      const userId = req.query.userId; // Obtener el ID del usuario desde la consulta
+
+      // Buscar los perfiles restringidos asociados con el ID de usuario
+      const usuariosRestringidos = await UsuarioRestringido.find({ userId: userId });
+
+      // Buscar el perfil de administrador
+      const adminProfile = await UsuarioRestringido.findOne({ nombreCompleto: "administrador" });
+
+      // Ordenar los perfiles para que el perfil de administrador aparezca primero
+      let profiles = usuariosRestringidos;
+      if (adminProfile) {
+          // Si se encuentra el perfil de administrador, lo agregamos al inicio de la lista
+          profiles = [adminProfile, ...usuariosRestringidos.filter(profile => profile._id !== adminProfile._id)];
+      }
+
+      res.status(200).json(profiles);
   } catch (error) {
-    console.error("Error al obtener los usuarios restringidos:", error);
-    res.status(500).json({ error: "Hubo un error al obtener los usuarios restringidos." });
+      console.error("Error al obtener los usuarios restringidos:", error);
+      res.status(500).json({ error: "Hubo un error al obtener los usuarios restringidos." });
   }
 };
+
 
 /**
  * Actualiza un usuario restringido
